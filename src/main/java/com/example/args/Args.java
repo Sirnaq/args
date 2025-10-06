@@ -145,24 +145,24 @@ public class Args {
         String parameter = null;
         try {
             parameter = args[currentArgument];
-            intArgs.get(argChar).setInteger(Integer.parseInt(parameter));
+            intArgs.get(argChar).set(parameter);
         } catch (ArrayIndexOutOfBoundsException e) {
             valid = false;
             errorArgumentId = argChar;
             errorCode = ErrorCode.MISSING_INTEGER;
             throw new ArgsException();
-        } catch (NumberFormatException e) {
+        } catch (ArgsException e) {
             valid = false;
             errorArgumentId = argChar;
             errorCode = ErrorCode.INVALID_INTEGER;
-            throw new ArgsException();
+            throw e;
         }
     }
 
     private void setStringArg(char argChar) throws ArgsException {
         currentArgument++;
         try {
-            stringArgs.get(argChar).setString(args[currentArgument]);
+            stringArgs.get(argChar).set(args[currentArgument]);
         } catch (ArrayIndexOutOfBoundsException e) {
             valid = false;
             errorArgumentId = argChar;
@@ -176,7 +176,11 @@ public class Args {
     }
 
     private void setBooleanArg(char argChar, boolean value) {
-        booleanArgs.get(argChar).setBoolean(value);
+        try{
+            booleanArgs.get(argChar).set("true");
+        } catch (ArgsException e){
+        }
+
     }
 
     private boolean isBooleanArg(char argChar) {
@@ -223,7 +227,7 @@ public class Args {
 
     public boolean getBoolean(char arg){
         Args.ArgumentMarshaler am = booleanArgs.get(arg);
-        return am != null && am.getBoolean();
+        return am != null && (Boolean)am.get();
     }
 
     private int zeroIfNull(Integer i) {
@@ -236,12 +240,12 @@ public class Args {
 
     public String getString(char arg) {
         Args.ArgumentMarshaler am = stringArgs.get(arg);
-        return am == null ? "" : am.getString();
+        return am == null ? "" : (String)am.get();
     }
 
     public int getInt(char arg) {
         Args.ArgumentMarshaler am = intArgs.get(arg);
-        return am == null ? 0 : am.getInteger();
+        return am == null ? 0 : (Integer)am.get();
     }
 
     public boolean isValid() {
@@ -252,46 +256,56 @@ public class Args {
 
     }
 
-    private class ArgumentMarshaler {
-        private boolean booleanValue = false;
-        private String stringValue;
-        private int integerValue;
+    private abstract class ArgumentMarshaler {
 
-        public void setBoolean(boolean value) {
-            booleanValue = value;
-        }
+        public abstract void set(String s) throws ArgsException ;
 
-        public boolean getBoolean() {
-            return booleanValue;
-        }
-
-        public void setString(String s) {
-            stringValue = s;
-        }
-
-        public String getString(){
-            return stringValue == null ? "" : stringValue;
-        }
-
-        public void setInteger(int i){
-            integerValue = i;
-        }
-
-        public int getInteger(){
-            return integerValue;
-        }
-
+        public abstract Object get();
     }
 
     public class BooleanArgumentMarshaler extends ArgumentMarshaler {
+        private boolean booleanValue = false;
 
+        @Override
+        public void set(String s) {
+            booleanValue = true;
+        }
+
+        @Override
+        public Object get() {
+            return booleanValue;
+        }
     }
 
     private class StringArgumentMarshaler extends ArgumentMarshaler {
+        private String stringValue;
 
+        @Override
+        public void set(String s) {
+            stringValue = s;
+        }
+
+        @Override
+        public Object get() {
+            return stringValue;
+        }
     }
 
     private class IntegerArgumentMarshaler extends ArgumentMarshaler {
+        private int intValue = 0;
 
+        @Override
+        public void set(String s) throws ArgsException {
+            try {
+                intValue = Integer.parseInt(s);
+            } catch (NumberFormatException e){
+                throw new ArgsException();
+            }
+        }
+
+        @Override
+        public Object get() {
+            return intValue;
+        }
     }
 }
