@@ -8,7 +8,7 @@ public class Args {
     private final String[] args;
     private boolean valid = true;
     private final Set<Character> unexpectedArguments = new TreeSet<Character>();
-    private final Map<Character, Boolean> booleanArgs = new HashMap<Character, Boolean>();
+    private final Map<Character, ArgumentMarshaler> booleanArgs = new HashMap<Character, ArgumentMarshaler>();
     private final Map<Character, String> stringArgs = new HashMap<Character, String>();
     private final Map<Character, Integer> intArgs = new HashMap<Character, Integer>();
     private final Set<Character> argsFound = new HashSet<Character>();
@@ -72,7 +72,7 @@ public class Args {
     }
 
     private void parseBooleanSchemaElement(char elementId) {
-        booleanArgs.put(elementId, false);
+        booleanArgs.put(elementId, new BooleanArgumentMarshaler());
     }
 
     private void parseIntegerSchemaElement(char elementId) {
@@ -176,7 +176,7 @@ public class Args {
     }
 
     private void setBooleanArg(char argChar, boolean value) {
-        booleanArgs.put(argChar, value);
+        booleanArgs.get(argChar).setBoolean(value);
     }
 
     private boolean isBooleanArg(char argChar) {
@@ -221,8 +221,9 @@ public class Args {
         return message.toString();
     }
 
-    private boolean falseIfNull(Boolean b) {
-        return b != null && b;
+    public boolean getBoolean(char arg){
+        Args.ArgumentMarshaler am = booleanArgs.get(arg);
+        return am != null && am.getBoolean();
     }
 
     private int zeroIfNull(Integer i) {
@@ -241,15 +242,35 @@ public class Args {
         return zeroIfNull(intArgs.get(arg));
     }
 
-    public boolean getBoolean(char arg) {
-        return falseIfNull(booleanArgs.get(arg));
-    }
-
     public boolean isValid() {
         return valid;
     }
 
     private class ArgsException extends Exception {
+
+    }
+
+    private class ArgumentMarshaler {
+        private boolean booleanValue = false;
+
+        public void setBoolean(boolean value) {
+            booleanValue = value;
+        }
+
+        public boolean getBoolean() {
+            return booleanValue;
+        }
+    }
+
+    public class BooleanArgumentMarshaler extends ArgumentMarshaler {
+
+    }
+
+    private class StringArgumentMarshaler extends ArgumentMarshaler {
+
+    }
+
+    private class IntegerArgumentMarshaler extends ArgumentMarshaler {
 
     }
 }
