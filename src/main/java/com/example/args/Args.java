@@ -9,8 +9,8 @@ public class Args {
     private boolean valid = true;
     private final Set<Character> unexpectedArguments = new TreeSet<Character>();
     private final Map<Character, ArgumentMarshaler> booleanArgs = new HashMap<Character, ArgumentMarshaler>();
-    private final Map<Character, String> stringArgs = new HashMap<Character, String>();
-    private final Map<Character, Integer> intArgs = new HashMap<Character, Integer>();
+    private final Map<Character, ArgumentMarshaler> stringArgs = new HashMap<Character, ArgumentMarshaler>();
+    private final Map<Character, ArgumentMarshaler> intArgs = new HashMap<Character, ArgumentMarshaler>();
     private final Set<Character> argsFound = new HashSet<Character>();
     private int currentArgument;
     private char errorArgumentId = '\0';
@@ -76,11 +76,11 @@ public class Args {
     }
 
     private void parseIntegerSchemaElement(char elementId) {
-        intArgs.put(elementId, 0);
+        intArgs.put(elementId, new IntegerArgumentMarshaler());
     }
 
     private void parseStringSchemaElement(char elementId) {
-        stringArgs.put(elementId, "");
+        stringArgs.put(elementId, new StringArgumentMarshaler());
     }
 
     private boolean isStringSchemaElement(String elementTail) {
@@ -145,7 +145,7 @@ public class Args {
         String parameter = null;
         try {
             parameter = args[currentArgument];
-            intArgs.put(argChar, Integer.parseInt(parameter));
+            intArgs.get(argChar).setInteger(Integer.parseInt(parameter));
         } catch (ArrayIndexOutOfBoundsException e) {
             valid = false;
             errorArgumentId = argChar;
@@ -162,7 +162,7 @@ public class Args {
     private void setStringArg(char argChar) throws ArgsException {
         currentArgument++;
         try {
-            stringArgs.put(argChar, args[currentArgument]);
+            stringArgs.get(argChar).setString(args[currentArgument]);
         } catch (ArrayIndexOutOfBoundsException e) {
             valid = false;
             errorArgumentId = argChar;
@@ -235,11 +235,13 @@ public class Args {
     }
 
     public String getString(char arg) {
-        return blankIfNull(stringArgs.get(arg));
+        Args.ArgumentMarshaler am = stringArgs.get(arg);
+        return am == null ? "" : am.getString();
     }
 
     public int getInt(char arg) {
-        return zeroIfNull(intArgs.get(arg));
+        Args.ArgumentMarshaler am = intArgs.get(arg);
+        return am == null ? 0 : am.getInteger();
     }
 
     public boolean isValid() {
@@ -252,6 +254,8 @@ public class Args {
 
     private class ArgumentMarshaler {
         private boolean booleanValue = false;
+        private String stringValue;
+        private int integerValue;
 
         public void setBoolean(boolean value) {
             booleanValue = value;
@@ -260,6 +264,23 @@ public class Args {
         public boolean getBoolean() {
             return booleanValue;
         }
+
+        public void setString(String s) {
+            stringValue = s;
+        }
+
+        public String getString(){
+            return stringValue == null ? "" : stringValue;
+        }
+
+        public void setInteger(int i){
+            integerValue = i;
+        }
+
+        public int getInteger(){
+            return integerValue;
+        }
+
     }
 
     public class BooleanArgumentMarshaler extends ArgumentMarshaler {
