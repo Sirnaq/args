@@ -3,6 +3,10 @@ package com.example.args;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import static com.example.args.ArgsException.ErrorCode.INVALID_DOUBLE;
+import static com.example.args.ArgsException.ErrorCode.MISSING_DOUBLE;
+
+
 public class DoubleArgumentMarshaler implements ArgumentMarshaler {
     private double doubleValue = 0;
 
@@ -13,14 +17,17 @@ public class DoubleArgumentMarshaler implements ArgumentMarshaler {
             parameter = currentArgument.next();
             doubleValue = Double.parseDouble(parameter);
         } catch (NoSuchElementException e) {
-            throw new ArgsException(ArgsException.ErrorCode.MISSING_DOUBLE);
+            throw new ArgsException(MISSING_DOUBLE);
         } catch (NumberFormatException e) {
-            throw new ArgsException(ArgsException.ErrorCode.INVALID_DOUBLE, parameter);
+            throw new ArgsException(INVALID_DOUBLE, parameter);
         }
     }
 
-    @Override
-    public Object get() {
-        return doubleValue;
+
+    public static double getValue(ArgumentMarshaler am) {
+        if (am != null && am instanceof DoubleArgumentMarshaler)
+            return ((DoubleArgumentMarshaler) am).doubleValue;
+        else
+            return 0;
     }
 }

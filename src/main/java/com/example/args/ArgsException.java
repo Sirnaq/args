@@ -2,7 +2,7 @@ package com.example.args;
 
 public class ArgsException extends Exception {
     private char errorArgumentId = '\0';
-    private String errorParameter = "TILT";
+    private String errorParameter = null;
     private ErrorCode errorCode = ErrorCode.OK;
 
     public ArgsException() {
@@ -23,8 +23,8 @@ public class ArgsException extends Exception {
 
     public ArgsException(ErrorCode errorCode, char errorArgumentId, String errorParameter) {
         this.errorCode = errorCode;
-        this.errorArgumentId = errorArgumentId;
         this.errorParameter = errorParameter;
+        this.errorArgumentId = errorArgumentId;
     }
 
     public char getErrorArgumentId() {
@@ -69,12 +69,16 @@ public class ArgsException extends Exception {
                         errorArgumentId, errorParameter);
             case MISSING_DOUBLE:
                 return String.format("Nie można znaleźć parametru double dla -%c.", errorArgumentId);
+            case INVALID_ARGUMENT_NAME:
+                return String.format("'%c' nie jest prawidłową nazwą argumentu.", errorArgumentId);
+            case INVALID_ARGUMENT_FORMAT:
+                return String.format("'%s' nie jest prawidłowym formatem dokumentu.", errorArgumentId);
         }
         return "";
     }
 
     public enum ErrorCode {
         OK, MISSING_STRING, MISSING_INTEGER, INVALID_INTEGER, UNEXPECTED_ARGUMENT,
-        MISSING_DOUBLE, INVALID_DOUBLE, INVALID_ARGUMENT_NAME, INVALID_FORMAT
+        MISSING_DOUBLE, INVALID_DOUBLE, INVALID_ARGUMENT_NAME, INVALID_ARGUMENT_FORMAT
     }
 }

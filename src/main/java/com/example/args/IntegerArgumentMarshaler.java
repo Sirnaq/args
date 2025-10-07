@@ -3,6 +3,10 @@ package com.example.args;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import static com.example.args.ArgsException.ErrorCode.INVALID_INTEGER;
+import static com.example.args.ArgsException.ErrorCode.MISSING_INTEGER;
+
+
 public class IntegerArgumentMarshaler implements ArgumentMarshaler {
     private int intValue = 0;
 
@@ -13,14 +17,17 @@ public class IntegerArgumentMarshaler implements ArgumentMarshaler {
             parameter = currentArgument.next();
             intValue = Integer.parseInt(parameter);
         } catch (NoSuchElementException e) {
-            throw new ArgsException(ArgsException.ErrorCode.MISSING_INTEGER);
+            throw new ArgsException(MISSING_INTEGER);
         } catch (NumberFormatException e) {
-            throw new ArgsException(ArgsException.ErrorCode.INVALID_INTEGER, parameter);
+            throw new ArgsException(INVALID_INTEGER, parameter);
         }
     }
 
-    @Override
-    public Object get() {
-        return intValue;
+
+    public static int getValue(ArgumentMarshaler am) {
+        if (am != null && am instanceof IntegerArgumentMarshaler)
+            return ((IntegerArgumentMarshaler) am).intValue;
+        else
+            return 0;
     }
 }

@@ -3,7 +3,9 @@ package com.example.args;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class StringArgumentMarshaler implements ArgumentMarshaler{
+import static com.example.args.ArgsException.ErrorCode.MISSING_STRING;
+
+public class StringArgumentMarshaler implements ArgumentMarshaler {
     private String stringValue = "";
 
     @Override
@@ -11,12 +13,14 @@ public class StringArgumentMarshaler implements ArgumentMarshaler{
         try {
             stringValue = currentArgument.next();
         } catch (NoSuchElementException e) {
-            throw new ArgsException(ArgsException.ErrorCode.MISSING_STRING);
+            throw new ArgsException(MISSING_STRING);
         }
     }
 
-    @Override
-    public Object get() {
-        return stringValue;
+    public static String getValue(ArgumentMarshaler am) {
+        if (am != null && am instanceof StringArgumentMarshaler)
+            return ((StringArgumentMarshaler) am).stringValue;
+        else
+            return "false";
     }
 }

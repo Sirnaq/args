@@ -9,7 +9,7 @@ public class ArgsTest extends TestCase {
     }
 
     public void testWithNoSchemaButWithOneArgument() throws Exception {
-        try{
+        try {
             new Args("", new String[]{"-x"});
             fail();
         } catch (ArgsException e) {
@@ -22,7 +22,7 @@ public class ArgsTest extends TestCase {
         try {
             new Args("", new String[]{"-x, -y"});
             fail();
-        } catch (ArgsException e){
+        } catch (ArgsException e) {
             assertEquals(ArgsException.ErrorCode.UNEXPECTED_ARGUMENT, e.getErrorCode());
             assertEquals('x', e.getErrorArgumentId());
         }
@@ -32,7 +32,7 @@ public class ArgsTest extends TestCase {
         try {
             new Args("*", new String[]{});
             fail("Konstruktor Args powinien zgłosić wyjątek");
-        } catch (ArgsException e){
+        } catch (ArgsException e) {
             assertEquals(ArgsException.ErrorCode.INVALID_ARGUMENT_NAME, e.getErrorCode());
             assertEquals('*', e.getErrorArgumentId());
         }
@@ -43,7 +43,7 @@ public class ArgsTest extends TestCase {
             new Args("f~", new String[]{});
             fail("Konstruktor Args powinien zgłosić wyjątek");
         } catch (ArgsException e) {
-            assertEquals(ArgsException.ErrorCode.INVALID_FORMAT, e.getErrorCode());
+            assertEquals(ArgsException.ErrorCode.INVALID_ARGUMENT_FORMAT, e.getErrorCode());
             assertEquals('f', e.getErrorArgumentId());
         }
     }
