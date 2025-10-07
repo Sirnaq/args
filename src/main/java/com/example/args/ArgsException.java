@@ -58,7 +58,7 @@ public class ArgsException extends Exception {
             case UNEXPECTED_ARGUMENT:
                 return String.format("Nieoczekiwany argument -%c.", errorArgumentId);
             case MISSING_STRING:
-                return String.format("Nie można znaleźć parametru znakowego dla -%c.", errorArgumentId);
+                return String.format("Nie można znaleźć argumentu znakowego dla -%c.", errorArgumentId);
             case INVALID_INTEGER:
                 return String.format("Argument -%c oczekuje liczby całkowitej, a był '%s'.",
                         errorArgumentId, errorParameter);
