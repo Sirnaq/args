@@ -34,4 +34,12 @@ public class ArgsTest extends TestCase {
         assertTrue(args.has('x'));
         assertEquals(42, args.getInt('x'));
     }
+
+    public void testSimpleDoublePresent() throws Exception {
+        Args args = new Args("x##", new String[]{"-x","42.3"});
+        assertTrue(args.isValid());
+        assertEquals(1, args.cardinality());
+        assertTrue(args.has('x'));
+        assertEquals(42.3, args.getDouble('x'), .001);
+    }
 }
