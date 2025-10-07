@@ -36,10 +36,29 @@ public class ArgsTest extends TestCase {
     }
 
     public void testSimpleDoublePresent() throws Exception {
-        Args args = new Args("x##", new String[]{"-x","42.3"});
+        Args args = new Args("x##", new String[]{"-x", "42.3"});
         assertTrue(args.isValid());
         assertEquals(1, args.cardinality());
         assertTrue(args.has('x'));
         assertEquals(42.3, args.getDouble('x'), .001);
+    }
+
+    public void testInvalidDouble() throws Exception {
+        Args args = new Args("x##", new String[]{"-x", "Czterdzieści dwa"});
+        assertFalse(args.isValid());
+        assertEquals(0, args.cardinality());
+        assertFalse(args.has('x'));
+        assertEquals(0, args.getInt('x'));
+        assertEquals("Argument -x oczekuje wartości double, a był 'Czterdzieści dwa'.",
+                args.errorMessage());
+    }
+
+    public void testMissingDouble() throws Exception {
+        Args args = new Args("x##", new String[]{"-x"});
+        assertFalse(args.isValid());
+        assertEquals(0, args.cardinality());
+        assertFalse(args.has('x'));
+        assertEquals(0.0, args.getDouble('x'), 0.01);
+        assertEquals("Nie można znaleźć parametru double dla -x.", args.errorMessage());
     }
 }

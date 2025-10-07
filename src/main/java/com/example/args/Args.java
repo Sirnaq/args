@@ -140,6 +140,11 @@ public class Args {
                         errorArgumentId, errorParameter);
             case MISSING_INTEGER:
                 return String.format("Nie można znaleźć parametru całkowitego dla -%c.", errorArgumentId);
+            case INVALID_DOUBLE:
+                return String.format("Argument -%c oczekuje wartości double, a był '%s'.",
+                        errorArgumentId, errorParameter);
+            case MISSING_DOUBLE:
+                return String.format("Nie można znaleźć parametru double dla -%c.", errorArgumentId);
         }
         return "";
     }
@@ -281,6 +286,7 @@ public class Args {
                 errorCode = ErrorCode.MISSING_DOUBLE;
                 throw new ArgsException();
             } catch (NumberFormatException e) {
+                errorParameter = parameter;
                 errorCode = ErrorCode.INVALID_DOUBLE;
                 throw new ArgsException();
             }
